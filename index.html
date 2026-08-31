@@ -3,153 +3,136 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Drawing Log Manager backed by Supabase" />
+  <meta name="description" content="Controlled Drawing Log Manager" />
   <title>Drawing Log Manager</title>
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
-  <div id="toast" class="toast" aria-live="polite"></div>
+<div id="toast" class="toast" aria-live="polite"></div>
 
-  <section id="authView" class="auth-shell">
-    <div class="auth-card">
-      <div class="brand-mark">DLM</div>
-      <h1>Drawing Log Manager</h1>
-      <p class="muted">Controlled drawing numbering and register management.</p>
-
-      <form id="authForm" class="stack">
-        <label>Email
-          <input id="email" type="email" autocomplete="email" required />
-        </label>
-        <label>Password
-          <input id="password" type="password" autocomplete="current-password" minlength="6" required />
-        </label>
-        <button class="btn primary" type="submit">Sign in</button>
-        <button class="btn secondary" id="signUpBtn" type="button">Create account</button>
-      </form>
-      <p class="tiny muted">Access is controlled by Supabase Auth and database Row Level Security.</p>
-    </div>
-  </section>
-
-  <div id="appView" class="app-shell hidden">
-    <aside class="sidebar">
-      <div>
-        <div class="brand-row">
-          <div class="brand-mark small">DLM</div>
-          <div>
-            <strong>Drawing Log</strong>
-            <div class="tiny muted-light">Manager</div>
-          </div>
-        </div>
-        <nav class="nav">
-          <button class="nav-item active" data-page="dashboard">Dashboard</button>
-          <button class="nav-item" data-page="register">Drawing Register</button>
-          <button class="nav-item" data-page="new">New Drawing</button>
-        </nav>
-      </div>
-      <div class="sidebar-footer">
-        <div id="userEmail" class="tiny muted-light"></div>
-        <button id="logoutBtn" class="btn ghost full">Sign out</button>
-      </div>
-    </aside>
-
-    <main class="main">
-      <header class="topbar">
-        <div>
-          <h2 id="pageTitle">Dashboard</h2>
-          <p id="pageSubtitle" class="muted">Project drawing register overview</p>
-        </div>
-        <button id="quickNewBtn" class="btn primary">+ New Drawing</button>
-      </header>
-
-      <section id="dashboardPage" class="page">
-        <div class="stats-grid">
-          <article class="stat-card"><span>Total Drawings</span><strong id="statTotal">0</strong></article>
-          <article class="stat-card"><span>Active</span><strong id="statActive">0</strong></article>
-          <article class="stat-card"><span>Disciplines Used</span><strong id="statDisciplines">0</strong></article>
-          <article class="stat-card"><span>Document Types</span><strong id="statTypes">0</strong></article>
-        </div>
-
-        <div class="panel">
-          <div class="panel-head">
-            <div>
-              <h3>Recent Drawings</h3>
-              <p class="muted">Latest records created in the register</p>
-            </div>
-            <button class="btn secondary" data-go="register">View register</button>
-          </div>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>Document Number</th><th>Title</th><th>Discipline</th><th>Stage</th><th>Revision</th></tr></thead>
-              <tbody id="recentBody"></tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <section id="registerPage" class="page hidden">
-        <div class="toolbar">
-          <input id="searchInput" class="search" type="search" placeholder="Search number or title…" />
-          <select id="disciplineFilter"><option value="">All disciplines</option></select>
-          <select id="typeFilter"><option value="">All document types</option></select>
-          <button id="exportCsvBtn" class="btn secondary">Export CSV</button>
-        </div>
-        <div class="panel table-panel">
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr><th>Document Number</th><th>Title</th><th>Type</th><th>Discipline</th><th>Type/Level</th><th>Stage</th><th>Revision</th><th>Status</th></tr>
-              </thead>
-              <tbody id="registerBody"></tbody>
-            </table>
-          </div>
-          <div id="registerEmpty" class="empty hidden">No drawings match the current filters.</div>
-        </div>
-      </section>
-
-      <section id="newPage" class="page hidden">
-        <div class="form-layout">
-          <form id="newDrawingForm" class="panel form-panel">
-            <div class="section-title">
-              <h3>Drawing Information</h3>
-              <p class="muted">Choose controlled codes. The serial number is reserved atomically by PostgreSQL.</p>
-            </div>
-
-            <label class="span-2">Drawing Title
-              <input id="title" name="title" required placeholder="e.g. Chilled Water Layout - Level 1" />
-            </label>
-
-            <label>Portfolio<select id="portfolio" name="portfolio" required></select></label>
-            <label>Campus Plot<select id="campus" name="campus" required></select></label>
-            <label>Data Center<select id="dataCenter" name="dataCenter" required></select></label>
-            <label>Project / Contract<select id="projectContract" name="projectContract" required></select></label>
-            <label>Organization<select id="organization" name="organization" required></select></label>
-            <label>Document Type<select id="documentType" name="documentType" required></select></label>
-            <label>Discipline<select id="discipline" name="discipline" required></select></label>
-            <label>Drawing Type<select id="drawingType" name="drawingType" required></select></label>
-            <label>Level<select id="level" name="level" required></select></label>
-            <label>Stage<select id="stage" name="stage"><option value="">Not specified</option></select></label>
-            <label class="span-2">Comments<textarea id="comments" name="comments" rows="3"></textarea></label>
-
-            <div class="span-2 form-actions">
-              <button class="btn primary" id="createDrawingBtn" type="submit">Generate & Save Drawing Number</button>
-              <button class="btn secondary" type="reset">Clear</button>
-            </div>
-          </form>
-
-          <aside class="panel preview-panel">
-            <span class="eyebrow">NUMBER PREVIEW</span>
-            <div id="numberPreview" class="number-preview">Complete the fields to preview the number</div>
-            <div class="rule-note">
-              <strong>V1 numbering rule</strong>
-              <p>Portfolio-Campus-Data Center-Project-Organization-Document Type-Discipline-Type+Level-6 digit Serial</p>
-              <p>Stage is stored as metadata and is intentionally not inserted into the number.</p>
-            </div>
-          </aside>
-        </div>
-      </section>
-    </main>
+<section id="authView" class="auth-shell">
+  <div class="auth-card">
+    <div class="brand-mark">DLM</div>
+    <h1>Drawing Log Manager</h1>
+    <p class="muted">Controlled drawing numbering, revisions and register management.</p>
+    <form id="authForm" class="stack">
+      <label>Email<input id="email" type="email" autocomplete="email" required /></label>
+      <label>Password<input id="password" type="password" autocomplete="current-password" minlength="6" required /></label>
+      <button class="btn primary" type="submit">Sign in</button>
+      <button class="btn secondary" id="signUpBtn" type="button">Create account</button>
+    </form>
+    <p class="tiny muted">New accounts start as Viewer until an administrator assigns a higher role.</p>
   </div>
+</section>
 
-  <script type="module" src="./app.js"></script>
+<div id="appView" class="app-shell hidden">
+  <aside class="sidebar">
+    <div>
+      <div class="brand-row"><div class="brand-mark small">DLM</div><div><strong>Drawing Log</strong><div class="tiny muted-light">Manager</div></div></div>
+      <nav class="nav">
+        <button class="nav-item active" data-page="dashboard">Dashboard</button>
+        <button class="nav-item" data-page="register">Drawing Register</button>
+        <button class="nav-item role-create" data-page="new">New Drawing</button>
+        <button class="nav-item" data-page="codes">Code Lists</button>
+        <button class="nav-item" data-page="settings">Settings</button>
+      </nav>
+    </div>
+    <div class="sidebar-footer">
+      <span id="roleBadge" class="role-badge">viewer</span>
+      <div id="userEmail" class="tiny muted-light"></div>
+      <button id="logoutBtn" class="btn ghost full">Sign out</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div><h2 id="pageTitle">Dashboard</h2><p id="pageSubtitle" class="muted">Project drawing register overview</p></div>
+      <button id="quickNewBtn" class="btn primary role-create">+ New Drawing</button>
+    </header>
+
+    <section id="dashboardPage" class="page">
+      <div class="stats-grid">
+        <article class="stat-card"><span>Total Drawings</span><strong id="statTotal">0</strong></article>
+        <article class="stat-card"><span>Active</span><strong id="statActive">0</strong></article>
+        <article class="stat-card"><span>Disciplines Used</span><strong id="statDisciplines">0</strong></article>
+        <article class="stat-card"><span>Formal Revisions</span><strong id="statRevisions">0</strong></article>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><div><h3>Recent Drawings</h3><p class="muted">Latest records created in the register</p></div><button class="btn secondary" data-go="register">View register</button></div>
+        <div class="table-wrap"><table><thead><tr><th>Document Number</th><th>Title</th><th>Discipline</th><th>Stage</th><th>Revision</th><th>Status</th></tr></thead><tbody id="recentBody"></tbody></table></div>
+      </div>
+    </section>
+
+    <section id="registerPage" class="page hidden">
+      <div class="toolbar">
+        <input id="searchInput" class="search" type="search" placeholder="Search number or title…" />
+        <select id="disciplineFilter"><option value="">All disciplines</option></select>
+        <select id="typeFilter"><option value="">All document types</option></select>
+        <select id="statusFilter"><option value="">All statuses</option><option value="active">Active</option><option value="withdrawn">Withdrawn</option><option value="cancelled">Cancelled</option></select>
+        <button id="exportCsvBtn" class="btn secondary">Export CSV</button>
+      </div>
+      <div class="panel table-panel">
+        <div class="table-wrap"><table><thead><tr><th class="sortable" data-sort="document_number">Document Number</th><th class="sortable" data-sort="title">Title</th><th>Type</th><th>Discipline</th><th>Type/Level</th><th>Stage</th><th>Revision</th><th>Status</th><th></th></tr></thead><tbody id="registerBody"></tbody></table></div>
+        <div id="registerEmpty" class="empty hidden">No drawings match the current filters.</div>
+        <div class="pager"><span id="pagerInfo" class="muted tiny"></span><div><button id="prevPageBtn" class="btn secondary">Previous</button><button id="nextPageBtn" class="btn secondary">Next</button></div></div>
+      </div>
+    </section>
+
+    <section id="newPage" class="page hidden">
+      <div class="form-layout">
+        <form id="newDrawingForm" class="panel form-panel">
+          <div class="section-title"><h3>Drawing Information</h3><p class="muted">The database reserves the six-digit serial atomically to prevent duplicates.</p></div>
+          <label class="span-2">Drawing Title<input id="title" required placeholder="e.g. Chilled Water Layout - Level 1" /></label>
+          <label>Portfolio<select id="portfolio" required></select></label><label>Campus Plot<select id="campus" required></select></label>
+          <label>Data Center<select id="dataCenter" required></select></label><label>Project / Contract<select id="projectContract" required></select></label>
+          <label>Organization<select id="organization" required></select></label><label>Document Type<select id="documentType" required></select></label>
+          <label>Discipline<select id="discipline" required></select></label><label id="drawingTypeLabel">Drawing / DDE Type<select id="drawingType" required></select></label>
+          <label>Level<select id="level" required></select></label><label>Stage<select id="stage"><option value="">Not specified</option></select></label>
+          <label class="span-2">Comments<textarea id="comments" rows="3"></textarea></label>
+          <div class="span-2 form-actions"><button class="btn primary" id="createDrawingBtn" type="submit">Generate & Save Number</button><button class="btn secondary" type="reset">Clear</button></div>
+        </form>
+        <aside class="panel preview-panel"><span class="eyebrow">NUMBER PREVIEW</span><div id="numberPreview" class="number-preview">Complete the fields to preview the number</div><div class="rule-note"><strong>Controlled format</strong><p>Portfolio-Campus-Data Center-Project-Organization-Document Type-Discipline-Type+Level-Serial</p><p>Stage is metadata in V1 and is not inserted into the drawing number.</p></div></aside>
+      </div>
+    </section>
+
+    <section id="detailsPage" class="page hidden">
+      <div class="detail-head panel">
+        <div><button id="backToRegister" class="link-btn">← Back to register</button><h3 id="detailNumber" class="doc-number big"></h3><p id="detailTitle" class="muted"></p></div>
+        <div class="detail-actions"><button id="copyNumberBtn" class="btn secondary">Copy Number</button><button id="duplicateBtn" class="btn secondary role-create">Duplicate</button><select id="lifecycleSelect" class="role-controller"><option value="active">Active</option><option value="withdrawn">Withdrawn</option><option value="cancelled">Cancelled</option></select></div>
+      </div>
+      <div class="detail-grid">
+        <div class="panel detail-panel"><div class="panel-head"><h3>Drawing Metadata</h3><button id="editMetadataBtn" class="btn secondary role-edit">Edit</button></div><div id="metadataGrid" class="meta-grid"></div></div>
+        <div class="panel detail-panel"><div class="panel-head"><h3>Stage</h3></div><div class="stage-box"><select id="detailStage" class="role-edit"></select><button id="saveStageBtn" class="btn secondary role-edit">Update Stage Only</button><p class="tiny muted">A stage-only update does not increment the revision.</p></div></div>
+      </div>
+      <div class="panel section-gap">
+        <div class="panel-head"><div><h3>Revision History</h3><p class="muted">Formal issues and draft revisions</p></div><button id="openRevisionBtn" class="btn primary role-controller">+ Add Revision</button></div>
+        <div class="table-wrap"><table><thead><tr><th>Revision</th><th>Kind</th><th>Stage</th><th>File</th><th>Issue Status</th><th>Review Status</th><th>Description</th><th>Date</th></tr></thead><tbody id="revisionBody"></tbody></table></div>
+      </div>
+      <div class="panel section-gap"><div class="panel-head"><h3>Audit Trail</h3></div><div id="auditList" class="audit-list"></div></div>
+    </section>
+
+    <section id="codesPage" class="page hidden">
+      <div class="codes-layout">
+        <div class="panel"><div class="panel-head"><div><h3>Controlled Code Lists</h3><p class="muted">Reference data loaded directly from Supabase</p></div></div><div class="code-tabs" id="codeTabs"></div><div class="table-wrap"><table><thead><tr><th>Code</th><th>Name</th><th>Category / Kind</th><th>Active</th></tr></thead><tbody id="codeListBody"></tbody></table></div></div>
+        <form id="organizationForm" class="panel small-form admin-only"><div class="section-title"><h3>Add / Update Organization</h3><p class="muted">Admin only. Codes are exactly three letters/numbers.</p></div><label>Code<input id="orgCode" maxlength="3" required /></label><label>Name<input id="orgName" required /></label><label class="inline-check"><input id="orgActive" type="checkbox" checked /> Active</label><button class="btn primary" type="submit">Save Organization</button></form>
+      </div>
+    </section>
+
+    <section id="settingsPage" class="page hidden">
+      <div class="settings-grid">
+        <div class="panel settings-card"><div class="section-title"><h3>Numbering Settings</h3><p class="muted">Controlled project rules currently applied by the database.</p></div><div id="numberingInfo" class="meta-grid compact"></div></div>
+        <form id="filenameForm" class="panel settings-card admin-only"><div class="section-title"><h3>Filename Template</h3><p class="muted">Allowed placeholders: {document_number}, {revision}, {extension}, optional {title}.</p></div><label>Template<input id="filenameTemplate" required /></label><div id="filenamePreview" class="number-preview small"></div><button class="btn primary" type="submit">Save Template</button></form>
+        <div class="panel settings-card"><div class="section-title"><h3>My Access</h3></div><div class="access-card"><strong id="settingsRole">viewer</strong><p id="roleDescription" class="muted"></p></div></div>
+        <div class="panel settings-card"><div class="section-title"><h3>Source Notes</h3></div><p class="muted small-text">Stage remains metadata because the source drawing-number example omits it although accompanying text mentions it. As-Built is mapped to Stage 5C based on Appendix J / QA. Filename pattern is configurable because source examples and QA wording conflict.</p></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div id="revisionModal" class="modal hidden"><div class="modal-card"><div class="modal-head"><h3>Add Revision</h3><button class="icon-btn" data-close="revisionModal">×</button></div><form id="revisionForm" class="modal-body form-panel single"><label>Stage<select id="revisionStage" required></select></label><label>File Extension<select id="revisionExtension" required><option>PDF</option><option>DWG</option><option>RVT</option><option>NWC</option><option>NWD</option><option>IFC</option><option>AVI</option></select></label><label>Issue Type<select id="revisionFormal"><option value="true">Formal Issue</option><option value="false">Draft</option></select></label><label>Issue Status<select id="issueStatus"><option value="">None</option></select></label><label>Review Status<select id="reviewStatus"><option value="">None</option></select></label><label class="span-2">Reason for Issue<input id="reasonForIssue" /></label><label class="span-2">Revision Description<textarea id="revisionDescription" rows="3"></textarea></label><div class="span-2 form-actions"><button class="btn primary" type="submit">Create Revision</button><button class="btn secondary" type="button" data-close="revisionModal">Cancel</button></div></form></div></div>
+
+<div id="metadataModal" class="modal hidden"><div class="modal-card narrow"><div class="modal-head"><h3>Edit Metadata</h3><button class="icon-btn" data-close="metadataModal">×</button></div><form id="metadataForm" class="modal-body stack"><label>Title<input id="editTitle" required /></label><label>Comments<textarea id="editComments" rows="4"></textarea></label><button class="btn primary" type="submit">Save</button></form></div></div>
+
+<script type="module" src="./app.js"></script>
 </body>
 </html>
