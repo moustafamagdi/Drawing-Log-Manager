@@ -22,7 +22,6 @@ async function loadLookups(){
   for(const [id,name] of Object.entries(map)){ const el=$(id); const first=id==='stage'?'<option value="">Not specified</option>':'<option value="">Select…</option>'; el.innerHTML=first+state.lookups[name].map(r=>`<option value="${esc(r.code)}">${esc(r.code)} — ${esc(r.name)}</option>`).join(''); }
   $('disciplineFilter').innerHTML=optionRows(state.lookups.disciplines,'All disciplines');
   $('typeFilter').innerHTML=optionRows(state.lookups.document_types,'All document types');
-  // Useful defaults from the source examples without forcing them.
   if(state.lookups.portfolios.some(x=>x.code==='SAAD')) $('portfolio').value='SAAD';
   updatePreview();
 }
@@ -87,7 +86,14 @@ async function enterApp(session){
 function leaveApp(){state.user=null;state.rows=[];$('appView').classList.add('hidden');$('authView').classList.remove('hidden');}
 
 $('authForm').addEventListener('submit',async e=>{e.preventDefault();const {data,error}=await supabase.auth.signInWithPassword({email:$('email').value,password:$('password').value});if(error)return toast(error.message,true);if(data.session)enterApp(data.session);});
-$('signUpBtn').addEventListener('click',async()=>{const email=$('email').value,password=$('password').value;if(!email||!password)return toast('Enter email and password first',true);const {data,error}=await supabase.auth.signUp({email,password});if(error)return toast(error.message,true);toast(data.session?'Account created':'Account created. Check your email if confirmation is enabled.');});
+$('signUpBtn').addEventListener('click',async()=>{
+  const email=$('email').value,password=$('password').value;
+  if(!email||!password)return toast('Enter email and password first',true);
+  const redirectUrl=new URL('.',window.location.href).href;
+  const {data,error}=await supabase.auth.signUp({email,password,options:{emailRedirectTo:redirectUrl}});
+  if(error)return toast(error.message,true);
+  toast(data.session?'Account created':'Account created. Check your email to confirm your account.');
+});
 $('logoutBtn').addEventListener('click',async()=>{await supabase.auth.signOut();leaveApp();});
 document.querySelectorAll('.nav-item').forEach(b=>b.addEventListener('click',()=>navigate(b.dataset.page)));
 document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>navigate(b.dataset.go)));
