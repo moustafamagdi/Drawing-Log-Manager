@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Drawing Log Manager backed by Supabase" />
+  <title>Drawing Log Manager</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div id="toast" class="toast" aria-live="polite"></div>
+
+  <section id="authView" class="auth-shell">
+    <div class="auth-card">
+      <div class="brand-mark">DLM</div>
+      <h1>Drawing Log Manager</h1>
+      <p class="muted">Controlled drawing numbering and register management.</p>
+
+      <form id="authForm" class="stack">
+        <label>Email
+          <input id="email" type="email" autocomplete="email" required />
+        </label>
+        <label>Password
+          <input id="password" type="password" autocomplete="current-password" minlength="6" required />
+        </label>
+        <button class="btn primary" type="submit">Sign in</button>
+        <button class="btn secondary" id="signUpBtn" type="button">Create account</button>
+      </form>
+      <p class="tiny muted">Access is controlled by Supabase Auth and database Row Level Security.</p>
+    </div>
+  </section>
+
+  <div id="appView" class="app-shell hidden">
+    <aside class="sidebar">
+      <div>
+        <div class="brand-row">
+          <div class="brand-mark small">DLM</div>
+          <div>
+            <strong>Drawing Log</strong>
+            <div class="tiny muted-light">Manager</div>
+          </div>
+        </div>
+        <nav class="nav">
+          <button class="nav-item active" data-page="dashboard">Dashboard</button>
+          <button class="nav-item" data-page="register">Drawing Register</button>
+          <button class="nav-item" data-page="new">New Drawing</button>
+        </nav>
+      </div>
+      <div class="sidebar-footer">
+        <div id="userEmail" class="tiny muted-light"></div>
+        <button id="logoutBtn" class="btn ghost full">Sign out</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <h2 id="pageTitle">Dashboard</h2>
+          <p id="pageSubtitle" class="muted">Project drawing register overview</p>
+        </div>
+        <button id="quickNewBtn" class="btn primary">+ New Drawing</button>
+      </header>
+
+      <section id="dashboardPage" class="page">
+        <div class="stats-grid">
+          <article class="stat-card"><span>Total Drawings</span><strong id="statTotal">0</strong></article>
+          <article class="stat-card"><span>Active</span><strong id="statActive">0</strong></article>
+          <article class="stat-card"><span>Disciplines Used</span><strong id="statDisciplines">0</strong></article>
+          <article class="stat-card"><span>Document Types</span><strong id="statTypes">0</strong></article>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <h3>Recent Drawings</h3>
+              <p class="muted">Latest records created in the register</p>
+            </div>
+            <button class="btn secondary" data-go="register">View register</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Document Number</th><th>Title</th><th>Discipline</th><th>Stage</th><th>Revision</th></tr></thead>
+              <tbody id="recentBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="registerPage" class="page hidden">
+        <div class="toolbar">
+          <input id="searchInput" class="search" type="search" placeholder="Search number or title…" />
+          <select id="disciplineFilter"><option value="">All disciplines</option></select>
+          <select id="typeFilter"><option value="">All document types</option></select>
+          <button id="exportCsvBtn" class="btn secondary">Export CSV</button>
+        </div>
+        <div class="panel table-panel">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Document Number</th><th>Title</th><th>Type</th><th>Discipline</th><th>Type/Level</th><th>Stage</th><th>Revision</th><th>Status</th></tr>
+              </thead>
+              <tbody id="registerBody"></tbody>
+            </table>
+          </div>
+          <div id="registerEmpty" class="empty hidden">No drawings match the current filters.</div>
+        </div>
+      </section>
+
+      <section id="newPage" class="page hidden">
+        <div class="form-layout">
+          <form id="newDrawingForm" class="panel form-panel">
+            <div class="section-title">
+              <h3>Drawing Information</h3>
+              <p class="muted">Choose controlled codes. The serial number is reserved atomically by PostgreSQL.</p>
+            </div>
+
+            <label class="span-2">Drawing Title
+              <input id="title" name="title" required placeholder="e.g. Chilled Water Layout - Level 1" />
+            </label>
+
+            <label>Portfolio<select id="portfolio" name="portfolio" required></select></label>
+            <label>Campus Plot<select id="campus" name="campus" required></select></label>
+            <label>Data Center<select id="dataCenter" name="dataCenter" required></select></label>
+            <label>Project / Contract<select id="projectContract" name="projectContract" required></select></label>
+            <label>Organization<select id="organization" name="organization" required></select></label>
+            <label>Document Type<select id="documentType" name="documentType" required></select></label>
+            <label>Discipline<select id="discipline" name="discipline" required></select></label>
+            <label>Drawing Type<select id="drawingType" name="drawingType" required></select></label>
+            <label>Level<select id="level" name="level" required></select></label>
+            <label>Stage<select id="stage" name="stage"><option value="">Not specified</option></select></label>
+            <label class="span-2">Comments<textarea id="comments" name="comments" rows="3"></textarea></label>
+
+            <div class="span-2 form-actions">
+              <button class="btn primary" id="createDrawingBtn" type="submit">Generate & Save Drawing Number</button>
+              <button class="btn secondary" type="reset">Clear</button>
+            </div>
+          </form>
+
+          <aside class="panel preview-panel">
+            <span class="eyebrow">NUMBER PREVIEW</span>
+            <div id="numberPreview" class="number-preview">Complete the fields to preview the number</div>
+            <div class="rule-note">
+              <strong>V1 numbering rule</strong>
+              <p>Portfolio-Campus-Data Center-Project-Organization-Document Type-Discipline-Type+Level-6 digit Serial</p>
+              <p>Stage is stored as metadata and is intentionally not inserted into the number.</p>
+            </div>
+          </aside>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
