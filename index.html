@@ -34,7 +34,7 @@
         <button class="nav-item" data-page="register">Drawing Register</button>
         <button class="nav-item role-create" data-page="new">New Drawing</button>
         <button class="nav-item" data-page="codes">Code Lists</button>
-        <button class="nav-item" data-page="settings">Settings</button>
+        <button class="nav-item" data-page="settings">Settings & Access</button>
       </nav>
     </div>
     <div class="sidebar-footer">
@@ -91,7 +91,7 @@
           <label class="span-2">Comments<textarea id="comments" rows="3"></textarea></label>
           <div class="span-2 form-actions"><button class="btn primary" id="createDrawingBtn" type="submit">Generate & Save Number</button><button class="btn secondary" type="reset">Clear</button></div>
         </form>
-        <aside class="panel preview-panel"><span class="eyebrow">NUMBER PREVIEW</span><div id="numberPreview" class="number-preview">Complete the fields to preview the number</div><div class="rule-note"><strong>Controlled format</strong><p>Portfolio-Campus-Data Center-Project-Organization-Document Type-Discipline-Type+Level-Serial</p><p>Stage is metadata in V1 and is not inserted into the drawing number.</p></div></aside>
+        <aside class="panel preview-panel"><span class="eyebrow">NUMBER PREVIEW</span><div id="numberPreview" class="number-preview">Complete the fields to preview the number</div><div class="rule-note"><strong>Controlled format</strong><p>Portfolio-Campus-Data Center-Project-Organization-Document Type-Discipline-Type+Level-Serial</p><p>Stage is metadata and is not inserted into the drawing number.</p></div></aside>
       </div>
     </section>
 
@@ -112,18 +112,35 @@
     </section>
 
     <section id="codesPage" class="page hidden">
-      <div class="codes-layout">
-        <div class="panel"><div class="panel-head"><div><h3>Controlled Code Lists</h3><p class="muted">Reference data loaded directly from Supabase</p></div></div><div class="code-tabs" id="codeTabs"></div><div class="table-wrap"><table><thead><tr><th>Code</th><th>Name</th><th>Category / Kind</th><th>Active</th></tr></thead><tbody id="codeListBody"></tbody></table></div></div>
-        <form id="organizationForm" class="panel small-form admin-only"><div class="section-title"><h3>Add / Update Organization</h3><p class="muted">Admin only. Codes are exactly three letters/numbers.</p></div><label>Code<input id="orgCode" maxlength="3" required /></label><label>Name<input id="orgName" required /></label><label class="inline-check"><input id="orgActive" type="checkbox" checked /> Active</label><button class="btn primary" type="submit">Save Organization</button></form>
+      <div class="codes-layout wide-admin">
+        <div class="panel">
+          <div class="panel-head"><div><h3>Controlled Code Lists</h3><p class="muted">All reference lists used by the application. Inactive codes stay visible here but are removed from creation dropdowns.</p></div><button id="newCodeBtn" class="btn primary admin-only">+ New Code</button></div>
+          <div class="code-tabs" id="codeTabs"></div>
+          <div class="table-wrap"><table><thead><tr><th>Code</th><th>Name</th><th>Category / Kind</th><th>Active</th><th class="admin-only">Admin Action</th></tr></thead><tbody id="codeListBody"></tbody></table></div>
+        </div>
+        <form id="codeEditorForm" class="panel small-form admin-only">
+          <div class="section-title"><h3 id="codeEditorTitle">Add Code</h3><p class="muted">Admin only. Existing codes are updated in place; use Active to retire a code without deleting history.</p></div>
+          <label>Code<input id="codeEditCode" required /></label>
+          <label>Name<input id="codeEditName" required /></label>
+          <label id="codeExtraLabel" class="hidden">Category / Kind<select id="codeEditExtra"></select></label>
+          <label id="codeTextExtraLabel" class="hidden">Category<input id="codeEditTextExtra" /></label>
+          <label id="codeSortLabel" class="hidden">Sort Order<input id="codeEditSort" type="number" /></label>
+          <label id="codeDescriptionLabel" class="hidden">Description<textarea id="codeEditDescription" rows="3"></textarea></label>
+          <label id="codeSourceLabel" class="hidden">Source Note<textarea id="codeEditSource" rows="2"></textarea></label>
+          <label class="inline-check"><input id="codeEditActive" type="checkbox" checked /> Active</label>
+          <div class="form-actions"><button class="btn primary" type="submit">Save Code</button><button id="cancelCodeEditBtn" class="btn secondary" type="button">Clear</button></div>
+        </form>
       </div>
     </section>
 
     <section id="settingsPage" class="page hidden">
       <div class="settings-grid">
-        <div class="panel settings-card"><div class="section-title"><h3>Numbering Settings</h3><p class="muted">Controlled project rules currently applied by the database.</p></div><div id="numberingInfo" class="meta-grid compact"></div></div>
-        <form id="filenameForm" class="panel settings-card admin-only"><div class="section-title"><h3>Filename Template</h3><p class="muted">Allowed placeholders: {document_number}, {revision}, {extension}, optional {title}.</p></div><label>Template<input id="filenameTemplate" required /></label><div id="filenamePreview" class="number-preview small"></div><button class="btn primary" type="submit">Save Template</button></form>
+        <div class="panel settings-card"><div class="section-title"><h3>Numbering Standard</h3><p class="muted">These core fields are locked to the approved project numbering logic, not free admin preferences.</p></div><div id="numberingInfo" class="meta-grid compact"></div></div>
+        <form id="filenameForm" class="panel settings-card admin-only"><div class="section-title"><h3>Filename Template</h3><p class="muted">Admin can change the filename presentation only. Required: {document_number}, {revision}, {extension}; optional {title}.</p></div><label>Template<input id="filenameTemplate" required /></label><div id="filenamePreview" class="number-preview small"></div><button class="btn primary" type="submit">Save Template</button></form>
         <div class="panel settings-card"><div class="section-title"><h3>My Access</h3></div><div class="access-card"><strong id="settingsRole">viewer</strong><p id="roleDescription" class="muted"></p></div></div>
-        <div class="panel settings-card"><div class="section-title"><h3>Source Notes</h3></div><p class="muted small-text">Stage remains metadata because the source drawing-number example omits it although accompanying text mentions it. As-Built is mapped to Stage 5C based on Appendix J / QA. Filename pattern is configurable because source examples and QA wording conflict.</p></div>
+        <div class="panel settings-card"><div class="section-title"><h3>Permission Model</h3></div><div id="permissionMatrix" class="permission-list"></div></div>
+        <div id="userAccessCard" class="panel settings-card admin-only span-all"><div class="section-title"><h3>User Access</h3><p class="muted">Admin only. New confirmed accounts begin as Viewer.</p></div><div class="table-wrap"><table><thead><tr><th>Email</th><th>Role</th><th>Created</th><th>Last Sign-in</th><th></th></tr></thead><tbody id="userAccessBody"></tbody></table></div></div>
+        <div class="panel settings-card span-all"><div class="section-title"><h3>Controlled Decisions</h3></div><p class="muted small-text">Official drawing numbers are never hard-deleted or renumbered through the UI. Naming dimensions are fixed after allocation; use Duplicate to create a new controlled number. Lifecycle is handled by Active / Withdrawn / Cancelled. Stage can change without incrementing revision. Code-list entries are retired by setting them inactive rather than deleting them.</p></div>
       </div>
     </section>
   </main>
