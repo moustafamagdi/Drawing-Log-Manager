@@ -4,3 +4,4 @@ export const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_fOMBfK2pUZduDFUsJhx1nw_W
 
 window.DLM_CONFIG={url:SUPABASE_URL,key:SUPABASE_PUBLISHABLE_KEY};
 import('./admin.js').catch(()=>{});
+import('./legacy.js').catch(()=>{});
