@@ -17,3 +17,4 @@ import('./auth-enhancements.js').catch(()=>{});
 import('./remember-me.js').catch(()=>{});
 import('./legacy.js').catch(()=>{});
 import('./bulk-import.js').catch(()=>{});
+import('./historical-revisions.js').catch(()=>{});
