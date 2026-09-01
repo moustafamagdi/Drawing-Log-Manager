@@ -11,6 +11,10 @@ try{
   if(sessionStorage.getItem('dlm-remember-me')==='false'&&temp&&!localStorage.getItem(authKey))localStorage.setItem(authKey,temp);
 }catch{}
 
+// Must load before enhancement modules: blocks duplicate document-level listeners
+// that were being registered repeatedly by legacy polling code.
+await import('./stability-guard.js').catch(()=>{});
+
 import('./auth-enhancements.js').catch(()=>{});
 import('./remember-me.js').catch(()=>{});
 import('./legacy.js').catch(()=>{});
@@ -23,4 +27,6 @@ import('./planning.js').catch(()=>{});
 import('./planning-session.js').catch(()=>{});
 import('./planning-pro.js').catch(()=>{});
 import('./production-finish.js').catch(()=>{});
-import('./workflow-revision-polish.js').catch(()=>{});
+// Disabled pending rewrite: this observer-heavy polish layer duplicated detail-page
+// database work and could amplify UI stalls. Core revision history remains in app.js.
+// import('./workflow-revision-polish.js').catch(()=>{});
