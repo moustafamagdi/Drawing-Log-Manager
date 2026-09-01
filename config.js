@@ -20,3 +20,4 @@ import('./bulk-import.js').catch(()=>{});
 import('./historical-revisions.js').catch(()=>{});
 import('./admin-drawing-controls.js').catch(()=>{});
 import('./advanced-suite.js').catch(()=>{});
+import('./recovery-controls.js').catch(()=>{});
