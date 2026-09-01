@@ -22,3 +22,4 @@ import('./admin-drawing-controls.js').catch(()=>{});
 import('./advanced-suite.js').catch(()=>{});
 import('./recovery-controls.js').catch(()=>{});
 import('./planning.js').catch(()=>{});
+import('./planning-session.js').catch(()=>{});
