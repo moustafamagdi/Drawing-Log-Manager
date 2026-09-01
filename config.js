@@ -4,8 +4,6 @@ export const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_fOMBfK2pUZduDFUsJhx1nw_W
 
 window.DLM_CONFIG={url:SUPABASE_URL,key:SUPABASE_PUBLISHABLE_KEY};
 
-// Restore a temporary (session-only) Supabase session just long enough for the
-// app client to initialize. remember-me.js moves it back out of localStorage.
 try{
   const projectRef=new URL(SUPABASE_URL).hostname.split('.')[0];
   const authKey=`sb-${projectRef}-auth-token`;
@@ -23,3 +21,4 @@ import('./advanced-suite.js').catch(()=>{});
 import('./recovery-controls.js').catch(()=>{});
 import('./planning.js').catch(()=>{});
 import('./planning-session.js').catch(()=>{});
+import('./planning-pro.js').catch(()=>{});
