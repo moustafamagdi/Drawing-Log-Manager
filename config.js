@@ -22,3 +22,4 @@ import('./recovery-controls.js').catch(()=>{});
 import('./planning.js').catch(()=>{});
 import('./planning-session.js').catch(()=>{});
 import('./planning-pro.js').catch(()=>{});
+import('./production-finish.js').catch(()=>{});
