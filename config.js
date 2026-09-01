@@ -23,3 +23,4 @@ import('./planning.js').catch(()=>{});
 import('./planning-session.js').catch(()=>{});
 import('./planning-pro.js').catch(()=>{});
 import('./production-finish.js').catch(()=>{});
+import('./workflow-revision-polish.js').catch(()=>{});
