@@ -35,7 +35,7 @@ if(cfg){
         </form>
         <aside class="panel preview-panel">
           <span class="eyebrow">LEGACY NUMBER PREVIEW</span><div id="legacyPreview" class="number-preview">Complete all fields, Stage and serial to preview the number</div>
-          <div class="rule-note"><strong>Controlled format</strong><p>Portfolio-Campus-Data Center-Project-Organization-Document Type-Discipline-Stage-Type+Level-Serial</p><p>If the imported serial is above the current counter, the counter is raised safely. Duplicate numbers and serial scopes are blocked.</p></div>
+          <div class="rule-note"><strong>Controlled format</strong><p>Portfolio-Campus-Data Center-Project-Organization-Document Type-Discipline-Stage-Type+Level-Serial</p><p>The complete document number must be unique. The same six-digit serial may be reused when another controlled part of the number is different.</p></div>
           <div id="legacyLastResult" class="legacy-result hidden"></div>
         </aside>
       </div>`;
