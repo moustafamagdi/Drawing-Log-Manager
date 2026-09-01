@@ -29,6 +29,7 @@ import('./planning-pro.js').catch(()=>{});
 import('./production-finish.js').catch(()=>{});
 import('./stage-numbering-ui.js').catch(()=>{});
 import('./dashboard-polish.js').catch(()=>{});
+import('./bulk-tidp-assign.js').catch(()=>{});
 // Disabled pending rewrite: this observer-heavy polish layer duplicated detail-page
 // database work and could amplify UI stalls. Core revision history remains in app.js.
 // import('./workflow-revision-polish.js').catch(()=>{});
