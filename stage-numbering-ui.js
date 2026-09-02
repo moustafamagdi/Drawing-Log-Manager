@@ -40,4 +40,10 @@ function wire(){
 }
 
 wire();
-let attempts=0;const t=setInterval(()=>{wire();if(++attempts>30)clearInterval(t)},300);
+let attempts=0;
+function retryWire(){
+  wire();
+  attempts++;
+  if(attempts<=30)setTimeout(retryWire,300);
+}
+setTimeout(retryWire,300);
