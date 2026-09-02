@@ -8,7 +8,6 @@ if(cfg){
   const rememberFlag='dlm-remember-me';
   const supabase=createClient(cfg.url,cfg.key);
   const $=id=>document.getElementById(id);
-  let timer=null;
 
   function syncTemporarySession(){
     if(sessionStorage.getItem(rememberFlag)!=='false')return;
@@ -26,7 +25,6 @@ if(cfg){
   }
   async function init(){for(let i=0;i<30&&!inject();i++)await new Promise(r=>setTimeout(r,100));const {data:{session}}=await supabase.auth.getSession();if(session&&sessionStorage.getItem(rememberFlag)==='false')syncTemporarySession();}
   supabase.auth.onAuthStateChange((event,session)=>{if(!session)return;if(sessionStorage.getItem(rememberFlag)==='false')setTimeout(syncTemporarySession,0);});
-  timer=setInterval(syncTemporarySession,500);
   window.addEventListener('pagehide',syncTemporarySession);
   window.addEventListener('beforeunload',syncTemporarySession);
   setTimeout(()=>init(),0);
