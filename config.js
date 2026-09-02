@@ -21,7 +21,14 @@ import('./legacy.js').catch(()=>{});
 import('./bulk-import.js').catch(()=>{});
 import('./historical-revisions.js').catch(()=>{});
 import('./admin-drawing-controls.js').catch(()=>{});
-import('./advanced-suite.js').catch(()=>{});
+
+// Stability baseline 2026-09-02:
+// advanced-suite.js is intentionally disabled. It runs a 700 ms global polling loop,
+// re-enters init on auth state changes, scans the DOM repeatedly, and can create
+// multiple long-lived intervals. Its useful features will be reintroduced as
+// event-driven modules only.
+// import('./advanced-suite.js').catch(()=>{});
+
 import('./recovery-controls.js').catch(()=>{});
 import('./planning.js').catch(()=>{});
 import('./planning-session.js').catch(()=>{});
@@ -33,7 +40,14 @@ import('./bulk-tidp-assign.js').catch(()=>{});
 import('./tidp-csv-v3.js').catch(()=>{});
 import('./tidp-grid-editor-v2.js').catch(()=>{});
 import('./tidp-delivery-control-v3.js').catch(()=>{});
-import('./information-delivery-ux-v4.js').catch(()=>{});
+
+// information-delivery-ux-v4.js is intentionally disabled pending an event-driven
+// rewrite. Its subtree MutationObserver can react to DOM changes that it produces
+// itself, which is a direct browser-freeze risk when opening Schedule.
+// Core Schedule + spreadsheet editing + Delivery Control remain available through
+// tidp-grid-editor-v2.js and tidp-delivery-control-v3.js.
+// import('./information-delivery-ux-v4.js').catch(()=>{});
+
 // Disabled pending rewrite: this observer-heavy polish layer duplicated detail-page
 // database work and could amplify UI stalls. Core revision history remains in app.js.
 // import('./workflow-revision-polish.js').catch(()=>{});
