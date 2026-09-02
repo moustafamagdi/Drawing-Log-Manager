@@ -11,7 +11,10 @@ if (cfg) {
   const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const canControl = () => ['document_controller','admin'].includes(role);
   const canReopen = () => role === 'admin';
-  const today = () => new Date().toISOString().slice(0,10);
+  const today = () => {
+    const d = new Date();
+    return new Date(d.getTime() - d.getTimezoneOffset()*60000).toISOString().slice(0,10);
+  };
   const toast = (message,error=false) => {
     const t = $('toast'); if (!t) return;
     t.textContent = message; t.className = `toast show ${error?'error':'success'}`;
@@ -112,7 +115,8 @@ if (cfg) {
     const btn=$('td3Stage'); btn.disabled=true; btn.textContent='Loading…';
     try{
       const dbRows=await fetchDeliverables(ids);
-      await fetchRevisions(dbRows.map(r=>r.drawing_id));
+      const stagedDrawingIds=[...staged.values()].map(x=>x.drawing_id).filter(Boolean);
+      await fetchRevisions([...dbRows.map(r=>r.drawing_id),...stagedDrawingIds]);
       let added=0,skipped=0;
       const date=$('td3Date').value;
       const strategy=$('td3RevisionStrategy').value;
