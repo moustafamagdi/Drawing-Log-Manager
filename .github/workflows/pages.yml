@@ -23,6 +23,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Frontend stability gate
+        run: node scripts/stability-check.mjs
+      - name: Syntax check critical modules
+        run: |
+          node --check config.js
+          node --check planning.js
+          node --check tidp-grid-editor-v2.js
+          node --check tidp-delivery-control-v3.js
+          node --check production-finish.js
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact
