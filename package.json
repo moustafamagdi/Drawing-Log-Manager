@@ -1,0 +1,10 @@
+{
+  "name": "drawing-log-manager",
+  "version": "1.0.0",
+  "description": "Controlled drawing numbering, revisions and register management",
+  "private": true,
+  "scripts": {
+    "dev": "npx serve .",
+    "build": "echo 'Static site - no build step required'"
+  }
+}
