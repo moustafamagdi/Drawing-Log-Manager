@@ -40,6 +40,7 @@ import('./bulk-tidp-assign.js').catch(()=>{});
 import('./tidp-csv-v3.js').catch(()=>{});
 import('./tidp-grid-editor-v2.js').catch(()=>{});
 import('./tidp-delivery-control-v3.js').catch(()=>{});
+import('./baseline-correction.js').catch(()=>{});
 
 // information-delivery-ux-v4.js is intentionally disabled pending an event-driven
 // rewrite. Its subtree MutationObserver can react to DOM changes that it produces
